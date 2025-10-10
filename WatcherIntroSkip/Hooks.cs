@@ -16,8 +16,11 @@ namespace WatcherIntroSkip
             On.Menu.SleepAndDeathScreen.ctor += SleepAndDeathScreen_ctor;
             On.Menu.PauseMenu.ctor += PauseMenu_ctor;
 
-            IL.Menu.SlugcatSelectMenu.StartGame += SlugcatSelectMenu_StartGame;
+            IL.Menu.SlugcatSelectMenu.StartGame += SlugcatSelectMenu_StartGameSkip;
+            IL.Menu.SlugcatSelectMenu.StartGame += SlugcatSelectMenu_StartGameSlideShow;
+            IL.Menu.SlugcatSelectMenu.ContinueStartedGame += SlugcatSelectMenu_ContinueStartedGame;
         }
+
 
         private static void PauseMenu_ctor(On.Menu.PauseMenu.orig_ctor orig, Menu.PauseMenu self, ProcessManager manager, RainWorldGame game)
         {
@@ -30,7 +33,36 @@ namespace WatcherIntroSkip
             }
         }
 
-        private static void SlugcatSelectMenu_StartGame(ILContext il)
+        private static void SlugcatSelectMenu_StartGameSlideShow(ILContext il)
+        {
+            var c = new ILCursor(il);
+
+            try
+            {
+                if (c.TryGotoNext(MoveType.After,
+                    i => i.MatchLdarg(0),
+                    i => i.MatchLdfld(typeof(MainLoopProcess).GetField("manager")),
+                    i => i.MatchLdsfld(typeof(ProcessManager.ProcessID).GetField("SlideShow")),
+                    i => i.MatchCallvirt(typeof(ProcessManager).GetMethod("RequestMainProcessSwitch", new[] { typeof(ProcessManager.ProcessID) }))))
+                {
+                    c.EmitDelegate<Action>(() =>
+                    {
+                        if (Plugin.instance != null)
+                            Plugin.instance.warped = false;
+                    });
+                }
+                else
+                {
+                    Plugin.logger?.LogError("Failed to find IL pattern in SlugcatSelectMenu.StartGameSlideShow");
+                }
+            }
+            catch (Exception ex)
+            {
+                Plugin.logger?.LogError($"Exception in IL hook for SlugcatSelectMenu.StartGameSlideShow: {ex}");
+            }
+        }
+
+        private static void SlugcatSelectMenu_StartGameSkip(ILContext il)
         {
             var c = new ILCursor(il);
 
@@ -50,15 +82,42 @@ namespace WatcherIntroSkip
                 }
                 else
                 {
-                    Plugin.logger?.LogError("Failed to find IL pattern in SlugcatSelectMenu.StartGame");
+                    Plugin.logger?.LogError("Failed to find IL pattern in SlugcatSelectMenu.StartGameSkip");
                 }
             }
             catch (Exception ex)
             {
-                Plugin.logger?.LogError($"Exception in IL hook for SlugcatSelectMenu.StartGame: {ex}");
+                Plugin.logger?.LogError($"Exception in IL hook for SlugcatSelectMenu.StartGameSkip: {ex}");
             }
         }
 
+        private static void SlugcatSelectMenu_ContinueStartedGame(ILContext il)
+        {
+            var c = new ILCursor(il);
+            try
+            {
+                if (c.TryGotoNext(MoveType.After,
+                    i => i.MatchLdarg(0),
+                    i => i.MatchLdfld(typeof(MainLoopProcess).GetField("manager")),
+                    i => i.MatchLdsfld(typeof(ProcessManager.ProcessID).GetField("Game")),
+                    i => i.MatchCallvirt(typeof(ProcessManager).GetMethod("RequestMainProcessSwitch", new[] { typeof(ProcessManager.ProcessID) }))))
+                {
+                    c.EmitDelegate<Action>(() =>
+                    {
+                        if (Plugin.instance != null)
+                            Plugin.instance.warped = true;
+                    });
+                }
+                else
+                {
+                    Plugin.logger?.LogError("Failed to find IL pattern in SlugcatSelectMenu.ContinueStartedGame");
+                }
+            }
+            catch (Exception ex)
+            {
+                Plugin.logger?.LogError($"Exception in IL hook for SlugcatSelectMenu.ContinueStartedGame: {ex}");
+            }
+        }
 
         private static void SleepAndDeathScreen_ctor(On.Menu.SleepAndDeathScreen.orig_ctor orig, Menu.SleepAndDeathScreen self, ProcessManager manager, ProcessManager.ProcessID ID)
         {
@@ -93,6 +152,7 @@ namespace WatcherIntroSkip
             {
                 storySession.saveState.deathPersistentSaveData.reinforcedKarma = true;
             }
+            storySession.pendingSentientRotInfectionFromWarp = true;
 
             string warpDest;
             switch (region)
