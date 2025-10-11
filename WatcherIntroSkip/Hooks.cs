@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using UnityEngine;
 using Watcher;
@@ -45,9 +46,11 @@ namespace WatcherIntroSkip
                     i => i.MatchLdsfld(typeof(ProcessManager.ProcessID).GetField("SlideShow")),
                     i => i.MatchCallvirt(typeof(ProcessManager).GetMethod("RequestMainProcessSwitch", new[] { typeof(ProcessManager.ProcessID) }))))
                 {
-                    c.EmitDelegate<Action>(() =>
+                    c.MoveAfterLabels();
+                    c.Emit(OpCodes.Ldarg, 1);
+                    c.EmitDelegate<Action<SlugcatStats.Name>>(arg =>
                     {
-                        if (Plugin.instance != null)
+                        if (Plugin.instance != null && arg == WatcherEnums.SlugcatStatsName.Watcher)
                             Plugin.instance.warped = false;
                     });
                 }
@@ -74,9 +77,11 @@ namespace WatcherIntroSkip
                     i => i.MatchLdsfld(typeof(ProcessManager.ProcessID).GetField("Game")),
                     i => i.MatchCallvirt(typeof(ProcessManager).GetMethod("RequestMainProcessSwitch", new[] { typeof(ProcessManager.ProcessID) }))))
                 {
-                    c.EmitDelegate<Action>(() =>
+                    c.MoveAfterLabels();
+                    c.Emit(OpCodes.Ldarg, 1);
+                    c.EmitDelegate<Action<SlugcatStats.Name>>(arg =>
                     {
-                        if (Plugin.instance != null)
+                        if (Plugin.instance != null && arg == WatcherEnums.SlugcatStatsName.Watcher)
                             Plugin.instance.warped = false;
                     });
                 }
@@ -102,9 +107,11 @@ namespace WatcherIntroSkip
                     i => i.MatchLdsfld(typeof(ProcessManager.ProcessID).GetField("Game")),
                     i => i.MatchCallvirt(typeof(ProcessManager).GetMethod("RequestMainProcessSwitch", new[] { typeof(ProcessManager.ProcessID) }))))
                 {
-                    c.EmitDelegate<Action>(() =>
+                    c.MoveAfterLabels();
+                    c.Emit(OpCodes.Ldarg, 1);
+                    c.EmitDelegate<Action<SlugcatStats.Name>>(arg =>
                     {
-                        if (Plugin.instance != null)
+                        if (Plugin.instance != null && arg == WatcherEnums.SlugcatStatsName.Watcher)
                             Plugin.instance.warped = true;
                     });
                 }
@@ -132,6 +139,7 @@ namespace WatcherIntroSkip
         {
             orig(self, manager);
             Plugin.game = self;
+
             if (!Plugin.instance.warped)
             {
                 RainWorld.lockGameTimer = true;
