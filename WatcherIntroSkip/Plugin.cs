@@ -16,7 +16,7 @@ namespace WatcherIntroSkip
     [BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string PLUGIN_VERSION = "1.03";
+        public const string PLUGIN_VERSION = "1.05";
         public const string PLUGIN_NAME = "Watcher Intro Skip";
         public const string PLUGIN_GUID = "shrubfromtomorrow.watcherIntroSkip";
         internal static ManualLogSource logger;
@@ -62,6 +62,24 @@ namespace WatcherIntroSkip
                 init = true;
                 Hooks.Apply();
                 screenDims = RWCustom.Custom.rainWorld.options.ScreenSize;
+            }
+        }
+
+        public void Update()
+        {
+            if (Plugin.instance.warped) return;
+
+            var player = Plugin.game.Players[0];
+            if (player == null) return;
+
+            var room = player.Room;
+
+            if (room != null)
+            {
+                foreach (var shortcut in room.realizedRoom.shortcutsIndex)
+                {
+                    room.realizedRoom.lockedShortcuts.Add(shortcut);
+                }
             }
         }
     }

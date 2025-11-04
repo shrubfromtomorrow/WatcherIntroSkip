@@ -22,6 +22,7 @@ namespace WatcherIntroSkip
             IL.Menu.SlugcatSelectMenu.ContinueStartedGame += SlugcatSelectMenu_ContinueStartedGame;
         }
 
+        
 
         private static void PauseMenu_ctor(On.Menu.PauseMenu.orig_ctor orig, Menu.PauseMenu self, ProcessManager manager, RainWorldGame game)
         {
@@ -140,13 +141,13 @@ namespace WatcherIntroSkip
             orig(self, manager);
             Plugin.game = self;
 
-            if (!Plugin.instance.warped)
+            if (!Plugin.instance.warped && self.IsStorySession && self.StoryCharacter == WatcherEnums.SlugcatStatsName.Watcher)
             {
                 RainWorld.lockGameTimer = true;
             }
         }
 
-        public static void SpawnWarp(string region, string karmaReinforced)
+        public static void SpawnWarp(string region, string karmaReinforced, string spreadRot)
         {
             Plugin.game.ContinuePaused();
 
@@ -160,7 +161,10 @@ namespace WatcherIntroSkip
             {
                 storySession.saveState.deathPersistentSaveData.reinforcedKarma = true;
             }
-            storySession.pendingSentientRotInfectionFromWarp = true;
+            if (spreadRot == "true")
+            {
+                storySession.pendingSentientRotInfectionFromWarp = true;
+            }
 
             string warpDest;
             switch (region)
@@ -183,6 +187,8 @@ namespace WatcherIntroSkip
             spinningTopData.FromString(Regex.Split(warpDest, "><"));
 
             var player = Plugin.game.Players[0];
+            if (player == null) return;
+
             var currentRoom = player.Room.realizedRoom;
             var warpData = (spinningTopData.data as SpinningTopData).CreateWarpPointData(currentRoom);
 
