@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Security;
 using System.Security.Permissions;
 using BepInEx;
@@ -69,7 +70,7 @@ namespace WatcherIntroSkip
         {
             if (Plugin.instance.warped) return;
 
-            var player = Plugin.game?.Players[0];
+            var player = Plugin.game?.Players.FirstOrDefault();
             if (player == null) return;
 
             var room = player.Room;
