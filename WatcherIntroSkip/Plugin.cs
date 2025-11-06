@@ -69,7 +69,7 @@ namespace WatcherIntroSkip
         {
             if (Plugin.instance.warped) return;
 
-            var player = Plugin.game.Players[0];
+            var player = Plugin.game?.Players[0];
             if (player == null) return;
 
             var room = player.Room;
