@@ -77,7 +77,7 @@ namespace WatcherIntroSkip
 
             var room = player.Room;
 
-            if (room != null)
+            if (room?.realizedRoom?.shortcutsIndex != null)
             {
                 foreach (var shortcut in room.realizedRoom.shortcutsIndex)
                 {
