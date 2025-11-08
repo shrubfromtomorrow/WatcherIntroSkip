@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Security;
 using System.Security.Permissions;
 using BepInEx;
 using BepInEx.Logging;
 using Menu;
 using UnityEngine;
+using Watcher;
 
 #pragma warning disable CS0618
 [module: UnverifiableCode]
@@ -67,14 +69,15 @@ namespace WatcherIntroSkip
 
         public void Update()
         {
-            if (Plugin.instance.warped) return;
+            if (Plugin.instance.warped || Plugin.game == null) return;
+            if (Plugin.game.StoryCharacter != WatcherEnums.SlugcatStatsName.Watcher) return;
 
-            var player = Plugin.game.Players[0];
+            var player = Plugin.game.Players.FirstOrDefault();
             if (player == null) return;
 
             var room = player.Room;
 
-            if (room != null)
+            if (room?.realizedRoom?.shortcutsIndex != null)
             {
                 foreach (var shortcut in room.realizedRoom.shortcutsIndex)
                 {
