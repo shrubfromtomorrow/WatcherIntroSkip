@@ -69,8 +69,8 @@ namespace WatcherIntroSkip
 
         public void Update()
         {
-            if (Plugin.instance.warped) return;
-            if (Plugin.game?.StoryCharacter != WatcherEnums.SlugcatStatsName.Watcher) return;
+            if (Plugin.instance.warped || Plugin.game == null) return;
+            if (Plugin.game.StoryCharacter != WatcherEnums.SlugcatStatsName.Watcher) return;
 
             var player = Plugin.game.Players.FirstOrDefault();
             if (player == null) return;
