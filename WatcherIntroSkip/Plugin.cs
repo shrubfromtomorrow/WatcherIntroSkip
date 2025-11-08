@@ -6,6 +6,7 @@ using BepInEx;
 using BepInEx.Logging;
 using Menu;
 using UnityEngine;
+using Watcher;
 
 #pragma warning disable CS0618
 [module: UnverifiableCode]
@@ -69,8 +70,9 @@ namespace WatcherIntroSkip
         public void Update()
         {
             if (Plugin.instance.warped) return;
+            if (Plugin.game?.StoryCharacter != WatcherEnums.SlugcatStatsName.Watcher) return;
 
-            var player = Plugin.game?.Players.FirstOrDefault();
+            var player = Plugin.game.Players.FirstOrDefault();
             if (player == null) return;
 
             var room = player.Room;
