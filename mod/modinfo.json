@@ -1,0 +1,14 @@
+{
+  "id": "shrubfromtomorrow.watcherIntroSkip",
+  "name": "Watcher Intro Skip",
+  "version": "1.1",
+  "authors": "shrubfromtomorrow",
+  "checksum_override_version": false,
+  "description": "A mod to skip the first 3 Spinning Top encounters in Watcher. Select your landing region in the Remix menu.",
+  "requirements": ["watcher"],
+  "requirements_names": ["The Watcher"],
+  "tags": [
+    "Tools",
+    "Watcher"
+  ]
+}
